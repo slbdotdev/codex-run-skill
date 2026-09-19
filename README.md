@@ -12,7 +12,8 @@ another agent or automation harness.
 - managed worktrees and structured final output;
 - long-running jobs and process ownership;
 - inspecting a workspace after a failed run; and
-- choosing models for read-heavy work, changes, and independent review.
+- choosing models for read-heavy work, changes, and independent review,
+  including the named-model effort ladder.
 
 ## Install
 
