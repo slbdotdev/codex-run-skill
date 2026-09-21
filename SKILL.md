@@ -42,6 +42,12 @@ the interactive shell's `PATH`.
   combine it with `-o` when a caller needs a machine-readable result.
 - `--ephemeral` disables session persistence. Use it only when resumption and
   audit history are intentionally unnecessary.
+- `-c web_search=disabled` turns web search off. It is **on by default**, and a
+  query built from the task's contents leaves the machine, so pass it for work
+  that must not go upstream. Two plausible spellings are accepted and do
+  nothing: `-c tools.web_search=false` and `--disable web_search`. Neither
+  `[tools] web_search` in `config.toml` nor `--ignore-user-config` changes the
+  default. Confirm from `--json`, where each search is a `web_search` item.
 
 Check the installed CLI before relying on a flag:
 
