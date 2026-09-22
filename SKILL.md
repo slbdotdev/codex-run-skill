@@ -154,9 +154,9 @@ is a cost-aware starting-effort ladder, not a provider requirement:
 | Common name | Exact model string | Reference cost, input/output per MTok | Recommended starting effort |
 | --- | --- | ---: | --- |
 | Astra | `gpt-6-astra` | $10 / $50 | `low` |
-| Sol | `gpt-5.6-sol` | $4 / $20 | `medium` |
+| Sol | `gpt-6-sol` | $2 / $10 | `medium` |
 | Terra | `gpt-5.6-terra` | $2 / $12 | `high` |
-| Luna | `gpt-5.6-luna` | $0.20 / $1.20 | `xhigh` |
+| Luna | `gpt-6-luna` | $0.10 / $0.50 | `xhigh` |
 
 The reference prices are standard short-context API text-token rates; long
 context, service tier, and subscription quotas differ. Refresh the current
