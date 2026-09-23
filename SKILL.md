@@ -1,6 +1,6 @@
 ---
 name: codex-run
-description: Run Codex CLI non-interactively from another agent or automation harness, including prompt files, reviews, workspace and sandbox settings, asynchronous jobs, failure handling, structured output, and model selection. Use when dispatching Astra, Sol, Terra, Luna, or other GPT-family models by name.
+description: Run Codex CLI non-interactively from another agent or automation harness, including prompt files, reviews, workspace and sandbox settings, asynchronous jobs, failure handling, structured output, and model selection. Use when dispatching Astra, Sol, Luna, or other GPT-family models by name.
 ---
 
 # Run Codex headlessly
@@ -153,9 +153,8 @@ is a cost-aware starting-effort ladder, not a provider requirement:
 
 | Common name | Exact model string | Reference cost, input/output per MTok | Recommended starting effort |
 | --- | --- | ---: | --- |
-| Astra | `gpt-6-astra` | $10 / $50 | `low` |
-| Sol | `gpt-6-sol` | $2 / $10 | `medium` |
-| Terra | `gpt-5.6-terra` | $2 / $12 | `high` |
+| Astra | `gpt-6-astra` | $10 / $50 | `medium` |
+| Sol | `gpt-6-sol` | $2 / $10 | `high` |
 | Luna | `gpt-6-luna` | $0.10 / $0.50 | `xhigh` |
 
 The reference prices are standard short-context API text-token rates; long
@@ -164,10 +163,9 @@ model documentation before making a budget decision. Set the recommendation
 through configuration or a per-run override such as
 `-c model_reasoning_effort=xhigh`.
 
-- Astra is the flagship for the hardest end-to-end work; start cheap on its
-  effort scale and raise it for a measured need.
+- Astra is the flagship for the hardest end-to-end work; start at `medium`
+  and raise it for a measured need.
 - Sol is the flagship professional-work choice when the result matters.
-- Terra is the intelligence/cost balance for capable general work.
 - Luna is the cost-sensitive, high-volume choice; its low token price makes
   higher effort economical for reading, review, and retries.
 
