@@ -83,19 +83,40 @@ them from the repository being reviewed; select exactly the scope you mean:
 
 ```bash
 # Uncommitted staged, unstaged, and untracked changes.
-codex exec review --uncommitted - < /tmp/review-brief.md
+codex exec review --uncommitted < /dev/null
 
 # Changes introduced by one commit.
-codex exec review --commit <sha>
+codex exec review --commit <sha> < /dev/null
 
 # Changes from a base branch or ref.
-codex exec review --base origin/main
+codex exec review --base origin/main < /dev/null
 ```
 
+A scope selector and a custom prompt are mutually exclusive: `--uncommitted`,
+`--commit`, and `--base` each fail with `cannot be used with '[PROMPT]'` when
+given a prompt argument or `-`. To steer a review, pick one form:
+
+- **Preset scope, default instructions:** a selector alone, as above.
+- **Custom instructions:** no selector, and a brief that names the scope
+  itself, for example "Review the uncommitted changes shown by
+  `git status --short` and `git diff HEAD`, including untracked files; focus
+  on lock ordering and races."
+
+  ```bash
+  codex exec review - < /tmp/review-brief.md
+  ```
+
+This stays in review mode. Do not fall back to plain `codex exec` just because
+a selector rejected the prompt.
+
+Pass run-level flags such as `-C`, `-s`, and `--add-dir` to `exec` before
+`review` (`codex exec -C /path/to/repo -s read-only review ...`); the `review`
+subcommand rejects them. `-m`, `-o`, `--json`, `--output-schema`, `-c`, and
+`--ephemeral` work after `review`. `--title` requires `--commit`.
+
 The top-level `codex review` accepts the same selectors but not `-m`, `-o`, or
-`--json`, so prefer `codex exec review` in automation. Add a custom prompt when
-the default review is not enough. A review reports findings; it does not fix
-them.
+`--json`, so prefer `codex exec review` in automation. A review reports
+findings; it does not fix them.
 
 For independent review, prefer a model from a different family than the
 author where one is available. If no independent family is available and the
