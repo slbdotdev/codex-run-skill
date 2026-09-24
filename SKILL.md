@@ -92,11 +92,10 @@ codex exec review --commit <sha>
 codex exec review --base origin/main
 ```
 
-The top-level `codex review` command accepts the same review selectors. Add a
-custom prompt when the default review is not enough, and use `-m` with
-`codex exec review` when the review model must be explicit. Review reports are
-read-only with respect to the worktree: they identify findings without
-modifying the reviewed tree.
+The top-level `codex review` accepts the same selectors but not `-m`, `-o`, or
+`--json`, so prefer `codex exec review` in automation. Add a custom prompt when
+the default review is not enough. A review reports findings; it does not fix
+them.
 
 For independent review, prefer a model from a different family than the
 author where one is available. If no independent family is available and the
@@ -145,11 +144,9 @@ state the change when it affects cost, capability, or review independence.
 
 ## Choose a model
 
-Choose by the cost of an error and by the model names currently available to
-the account:
-
-These common names are shorthand; pass the exact model string to `-m`. This
-is a cost-aware starting-effort ladder, not a provider requirement:
+Choose by the cost of an error and by the models currently available to the
+account. The common names are shorthand; pass the exact model string to `-m`.
+The effort column is a cost-aware starting point, not a provider requirement:
 
 | Common name | Exact model string | Reference cost, input/output per MTok | Recommended starting effort |
 | --- | --- | ---: | --- |
@@ -165,17 +162,14 @@ through configuration or a per-run override such as
 
 - Astra is the flagship for the hardest end-to-end work; start at `medium`
   and raise it for a measured need.
-- Sol is the flagship professional-work choice when the result matters.
+- Sol is the mid-cost choice for professional work where the result matters.
 - Luna is the cost-sensitive, high-volume choice; its low token price makes
   higher effort economical for reading, review, and retries.
 
-- Use a cheaper long-context model for read-heavy work such as searching,
+- Use a cheaper model for read-heavy work such as searching,
   research, audits, reviews, and repository-wide wording changes when its
   result will be checked.
-- Use a stronger output-sensitive model for changes to keep, difficult fixes,
+- Use a stronger model for changes to keep, difficult fixes,
   and retries after a failed ingest or research run.
 - Keep model roles as configurable slots rather than embedding one fleet's
   nicknames or assuming that an old model ID still exists.
-
-For independent review, prefer a different model family from the author when
-one is available. Describe any same-family fallback honestly in the report.
