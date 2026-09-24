@@ -39,7 +39,8 @@ the interactive shell's `PATH`.
   structured final answer.
 - `-o, --output-last-message FILE` writes the final response to a file.
 - `--output-schema FILE` asks for a final response matching a JSON Schema;
-  combine it with `-o` when a caller needs a machine-readable result.
+  combine it with `-o` when a caller needs a machine-readable result. It has
+  no effect under `exec review`; see Review changes.
 - `--ephemeral` disables session persistence. Use it only when resumption and
   audit history are intentionally unnecessary.
 - `-c web_search=disabled` turns web search off. It is **on by default**, and a
@@ -111,8 +112,12 @@ a selector rejected the prompt.
 
 Pass run-level flags such as `-C`, `-s`, and `--add-dir` to `exec` before
 `review` (`codex exec -C /path/to/repo -s read-only review ...`); the `review`
-subcommand rejects them. `-m`, `-o`, `--json`, `--output-schema`, `-c`, and
-`--ephemeral` work after `review`. `--title` requires `--commit`.
+subcommand rejects them. `-m`, `-o`, `--json`, `-c`, and `--ephemeral` work
+after `review`. `--title` requires a scope selector, any of the three.
+
+`review` accepts `--output-schema` but ignores it (codex-cli 0.156.0): the
+final message is prose whatever the schema. For a machine-readable review, run
+plain `codex exec` with a review brief, `--output-schema`, and `-o`.
 
 The top-level `codex review` accepts the same selectors but not `-m`, `-o`, or
 `--json`, so prefer `codex exec review` in automation. A review reports
