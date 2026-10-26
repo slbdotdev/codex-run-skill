@@ -13,7 +13,7 @@ another agent or automation harness.
 - long-running jobs and process ownership;
 - inspecting a workspace after a failed run; and
 - choosing models for read-heavy work, changes, and independent review,
-  including the named-model effort ladder.
+  including the named-model effort ladder (Astra, Sol, Luna, and Terra).
 
 ## Install
 
