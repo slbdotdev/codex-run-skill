@@ -177,19 +177,26 @@ The effort column is a cost-aware starting point, not a provider requirement:
 | Common name | Exact model string | Reference cost, input/output per MTok | Recommended starting effort |
 | --- | --- | ---: | --- |
 | Astra | `gpt-6-astra` | $10 / $50 | `medium` |
-| Sol | `gpt-6-sol` | $2 / $10 | `high` |
+| Sol | `gpt-6.1-sol` | $2 / $10 | `high` |
 | Luna | `gpt-6-luna` | $0.10 / $0.50 | `xhigh` |
 | Terra | `gpt-6.1-terra` | $1 / $5 | `high` |
 
 The reference prices are standard short-context API text-token rates; long
 context, service tier, and subscription quotas differ. Refresh the current
-model documentation before making a budget decision. Set the recommendation
-through configuration or a per-run override such as
-`-c model_reasoning_effort=xhigh`.
+model documentation before making a budget decision. The models a signed-in
+Codex can use, with each one's default and supported efforts, are in
+`$CODEX_HOME/models_cache.json` (`slug`, `default_reasoning_level`,
+`supported_reasoning_levels`), which Codex refreshes as it runs; prefer the
+newest generation listed for a name. Set the recommendation through
+configuration or a per-run override such as `-c model_reasoning_effort=xhigh`.
 
 - Astra is the flagship for the hardest end-to-end work; start at `medium`
   and raise it for a measured need.
 - Sol is the mid-cost choice for professional work where the result matters.
+  `gpt-6.1-sol` is the GPT-6.1 generation of Sol, at `gpt-6-sol`'s price,
+  which the provider describes as near-Astra performance for complex work at
+  a lower cost. Codex's model list gives it a default effort of `low` (the
+  API page says `medium`), so set the effort explicitly on every run.
 - Luna is the cost-sensitive, high-volume choice; its low token price makes
   higher effort economical for reading, review, and retries.
 - Terra is a newer, GPT-6.1 generation model that the provider describes as
