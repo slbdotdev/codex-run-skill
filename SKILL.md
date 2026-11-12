@@ -30,9 +30,13 @@ the interactive shell's `PATH`.
   the account, not a remembered or machine-specific name.
 - `-s, --sandbox MODE` selects `read-only`, `workspace-write`, or
   `danger-full-access`. Use `read-only` when the task only needs inspection.
+- `--skip-git-repo-check` allows a run outside a Git repository. Without it,
+  `codex exec` exits with `Not inside a trusted directory and
+  --skip-git-repo-check was not specified.`
 - `--worktree` runs the session in a new managed Git worktree. Use it when the
   worker should be isolated from the caller's checkout; do not assume its
-  changes land in the primary worktree.
+  changes land in the primary worktree. It does not apply to reviews; see
+  Review changes.
 - `--add-dir DIR` grants an additional writable directory when the worker
   needs one outside its main root.
 - `--json` streams progress events as JSONL. It is not the same as a
@@ -45,10 +49,12 @@ the interactive shell's `PATH`.
   audit history are intentionally unnecessary.
 - `-c web_search=disabled` turns web search off. It is **on by default**, and a
   query built from the task's contents leaves the machine, so pass it for work
-  that must not go upstream. Two plausible spellings are accepted and do
-  nothing: `-c tools.web_search=false` and `--disable web_search`. Neither
-  `[tools] web_search` in `config.toml` nor `--ignore-user-config` changes the
-  default. Confirm from `--json`, where each search is a `web_search` item.
+  that must not go upstream. The key takes `disabled`, `cached`, `indexed`, or
+  `live`; any other value fails config loading. Two plausible spellings are
+  accepted and do nothing: `-c tools.web_search=false` and
+  `--disable web_search`. Neither `[tools] web_search` in `config.toml` nor
+  `--ignore-user-config` changes the default. Confirm from `--json`, where
+  each search is a `web_search` item.
 
 Check the installed CLI before relying on a flag:
 
@@ -93,7 +99,8 @@ codex exec review --commit <sha> < /dev/null
 codex exec review --base origin/main < /dev/null
 ```
 
-A scope selector and a custom prompt are mutually exclusive: `--uncommitted`,
+Use one selector per run; they are mutually exclusive with each other. A scope
+selector and a custom prompt are also mutually exclusive: `--uncommitted`,
 `--commit`, and `--base` each fail with `cannot be used with '[PROMPT]'` when
 given a prompt argument or `-`. To steer a review, pick one form:
 
@@ -113,7 +120,10 @@ a selector rejected the prompt.
 Pass run-level flags such as `-C`, `-s`, and `--add-dir` to `exec` before
 `review` (`codex exec -C /path/to/repo -s read-only review ...`); the `review`
 subcommand rejects them. `-m`, `-o`, `--json`, `-c`, and `--ephemeral` work
-after `review`. `--title` requires a scope selector, any of the three.
+after `review`. `--title` sets the commit title shown in the review summary,
+so pair it with `--commit`; given alone it fails asking for `--commit`.
+`review --help` lists `--worktree`, but the run fails with `--worktree is not
+supported for code review`.
 
 `review` accepts `--output-schema` but ignores it (codex-cli 0.156.0): the
 final message is prose whatever the schema. For a machine-readable review, run
@@ -174,12 +184,23 @@ Choose by the cost of an error and by the models currently available to the
 account. The common names are shorthand; pass the exact model string to `-m`.
 The effort column is a cost-aware starting point, not a provider requirement:
 
-| Common name | Exact model string | Reference cost, input/output per MTok | Recommended starting effort |
-| --- | --- | ---: | --- |
-| Astra | `gpt-6-astra` | $10 / $50 | `medium` |
-| Sol | `gpt-6.1-sol` | $2 / $10 | `high` |
-| Luna | `gpt-6-luna` | $0.10 / $0.50 | `xhigh` |
-| Terra | `gpt-6.1-terra` | $1 / $5 | `high` |
+| Common name | Exact model string | Reference cost, input/output per MTok | Codex default effort | Recommended starting effort |
+| --- | --- | ---: | --- | --- |
+| Astra | `gpt-6-astra` | $10 / $50 | `low` | `medium` |
+| Sol | `gpt-6.1-sol` | $2 / $10 | `low` | `high` |
+| Luna | `gpt-6-luna` | $0.10 / $0.50 | `medium` | `xhigh` |
+| Terra | `gpt-6.1-terra` | $1 / $5 | `low` | `high` |
+
+These four are the current generation of each name in Codex's model list
+(checked against codex-cli 0.167.2). With no model configured, Codex runs
+`gpt-6.1-sol`. Older slugs still resolve but are superseded, so do not choose
+them for new work: `gpt-6-sol`, `gpt-5.6-sol`, `gpt-5.6-terra`,
+`gpt-5.6-luna`, and the legacy `gpt-5.5`.
+
+The effort ladder is `low`, `medium`, `high`, `xhigh`, `max`, and `ultra`.
+`max` is the deepest single-agent setting; `ultra` adds automatic task
+delegation, so one run can fan out into several. Luna stops at `max`, and
+`gpt-5.5` at `xhigh`. Reserve `max` and `ultra` for a measured need.
 
 The reference prices are standard short-context API text-token rates; long
 context, service tier, and subscription quotas differ. Refresh the current
@@ -191,7 +212,8 @@ newest generation listed for a name. Set the recommendation through
 configuration or a per-run override such as `-c model_reasoning_effort=xhigh`.
 
 - Astra is the flagship for the hardest end-to-end work; start at `medium`
-  and raise it for a measured need.
+  and raise it for a measured need. Its Codex default is `low`, so set the
+  effort explicitly on every run.
 - Sol is the mid-cost choice for professional work where the result matters.
   `gpt-6.1-sol` is the GPT-6.1 generation of Sol, at `gpt-6-sol`'s price,
   which the provider describes as near-Astra performance for complex work at
@@ -202,7 +224,9 @@ configuration or a per-run override such as `-c model_reasoning_effort=xhigh`.
 - Terra is a newer, GPT-6.1 generation model that the provider describes as
   a fast, efficient model for visual reasoning, precise computer use, and
   clear, natural writing. Start reviews at `high`. Its own default effort is
-  `low`, so set the effort explicitly on every run.
+  `low`, so set the effort explicitly on every run. Codex gives it a larger
+  default context window than the others (500k against 272k tokens), which
+  suits read-heavy work over a large repository.
 
 - Use a cheaper model for read-heavy work such as searching,
   research, audits, reviews, and repository-wide wording changes when its
